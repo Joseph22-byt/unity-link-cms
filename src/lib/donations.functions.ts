@@ -7,7 +7,7 @@ export const getDonationQr = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase } = context;
-    const { data } = await supabase.from("app_settings").select("value, updated_at").eq("key", KEY).maybeSingle();
+    const { data } = await (supabase as any).from("app_settings").select("value, updated_at").eq("key", KEY).maybeSingle();
     const value = (data?.value ?? {}) as { path?: string; caption?: string; method?: string };
     let public_url: string | null = null;
     if (value.path) {
@@ -33,7 +33,7 @@ export const setDonationQr = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase.from("app_settings").upsert({
+    const { error } = await (supabase as any).from("app_settings").upsert({
       key: "donation_qr",
       value: { path: data.path, caption: data.caption ?? null, method: data.method ?? null },
       updated_by: userId,
@@ -46,7 +46,7 @@ export const setDonationQr = createServerFn({ method: "POST" })
 export const clearDonationQr = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { error } = await context.supabase.from("app_settings").delete().eq("key", "donation_qr");
+    const { error } = await (context.supabase as any).from("app_settings").delete().eq("key", "donation_qr");
     if (error) throw new Error(error.message);
     return { ok: true };
   });
