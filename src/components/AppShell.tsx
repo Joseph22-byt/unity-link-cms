@@ -1,24 +1,36 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, UserCircle, LogOut, Church, IdCard, Megaphone, Heart } from "lucide-react";
+import { LayoutDashboard, Users, UserCircle, LogOut, Church, IdCard, Megaphone, Heart, ClipboardList } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { getMyProfile } from "@/lib/members.functions";
 import type { ReactNode } from "react";
 
-const nav = [
+const STAFF_ROLES = ["super_admin", "admin", "pastor"];
+
+const baseNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/messages", label: "Announcements", icon: Megaphone },
   { to: "/donations", label: "Donations", icon: Heart },
   { to: "/id-card", label: "My ID Card", icon: IdCard },
   { to: "/members", label: "Members", icon: Users },
   { to: "/profile", label: "My Profile", icon: UserCircle },
-] as const;
+];
 
 export function AppShell({ children, title }: { children: ReactNode; title: string }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const me = useServerFn(getMyProfile);
+  const meQ = useQuery({ queryKey: ["me"], queryFn: () => me() });
+  const isStaff = (meQ.data?.roles ?? []).some((r: string) => STAFF_ROLES.includes(r));
+
+  const nav = isStaff
+    ? [...baseNav, { to: "/requests", label: "Join Requests", icon: ClipboardList }]
+    : baseNav;
 
   async function signOut() {
     await queryClient.cancelQueries();
