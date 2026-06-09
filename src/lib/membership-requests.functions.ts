@@ -1,25 +1,23 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { z } from "zod";
 
 export const submitMembershipRequest = createServerFn({ method: "POST" })
-  .inputValidator((raw: unknown) =>
-    z.object({
-      full_name: z.string().min(1).max(200),
-      email: z.string().email().max(300),
-      phone: z.string().max(50).optional(),
-      requested_role: z.enum(["member", "pastor", "staff"]),
-      message: z.string().max(2000).optional(),
-    }).parse(raw)
-  )
+  .inputValidator((d: { full_name: string; email: string; phone?: string; requested_role: string; message?: string }) => {
+    if (!d.full_name?.trim() || d.full_name.length > 200) throw new Error("Full name is required and must be under 200 characters");
+    if (!d.email?.trim() || d.email.length > 300 || !d.email.includes("@")) throw new Error("Valid email is required");
+    if (d.phone && d.phone.length > 50) throw new Error("Phone must be under 50 characters");
+    if (!["member", "pastor", "staff"].includes(d.requested_role)) throw new Error("Invalid role");
+    if (d.message && d.message.length > 2000) throw new Error("Message must be under 2000 characters");
+    return d;
+  })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("membership_requests").insert({
-      full_name: data.full_name,
-      email: data.email,
-      phone: data.phone ?? null,
+      full_name: data.full_name.trim(),
+      email: data.email.trim(),
+      phone: data.phone?.trim() || null,
       requested_role: data.requested_role,
-      message: data.message ?? null,
+      message: data.message?.trim() || null,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -40,12 +38,11 @@ export const listMembershipRequests = createServerFn({ method: "GET" })
 
 export const updateRequestStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
-    z.object({
-      id: z.string().uuid(),
-      status: z.enum(["pending", "approved", "rejected"]),
-    }).parse(raw)
-  )
+  .inputValidator((d: { id: string; status: "pending" | "approved" | "rejected" }) => {
+    if (!d.id) throw new Error("ID is required");
+    if (!["pending", "approved", "rejected"].includes(d.status)) throw new Error("Invalid status");
+    return d;
+  })
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { error } = await supabase
