@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getMyProfile, updateMyProfile } from "@/lib/members.functions";
+import { getMyProfile, updateMyProfile, saveMyPhoto } from "@/lib/members.functions";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { Upload } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({ meta: [{ title: "My Profile — Sanctuary" }] }),
@@ -29,6 +31,7 @@ function ProfilePage() {
 function ProfileBody() {
   const fetchMe = useServerFn(getMyProfile);
   const save = useServerFn(updateMyProfile);
+  const savePhoto = useServerFn(saveMyPhoto);
   const qc = useQueryClient();
   const { data: me } = useSuspenseQuery(queryOptions({ queryKey: ["me"], queryFn: () => fetchMe() }));
 
@@ -50,13 +53,45 @@ function ProfileBody() {
   }, [me.profile]);
 
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  async function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !me.profile) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5 MB"); return; }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+      const path = `${me.profile.id}/photo-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("member-photos").upload(path, file, { upsert: true, contentType: file.type });
+      if (upErr) throw upErr;
+      await savePhoto({ data: { path } });
+      toast.success("Photo updated");
+      qc.invalidateQueries({ queryKey: ["me"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
 
   return (
     <div className="max-w-3xl space-y-6">
       <Card className="p-8 border-border">
         <div className="flex items-start gap-6 mb-6">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center font-display text-3xl text-ink" style={{ background: "var(--gradient-gold)" }}>
-            {(form.first_name?.[0] ?? "") + (form.last_name?.[0] ?? "")}
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center font-display text-3xl text-ink" style={{ background: "var(--gradient-gold)" }}>
+              {me.photo_signed_url ? (
+                <img src={me.photo_signed_url} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span>{(form.first_name?.[0] ?? "") + (form.last_name?.[0] ?? "")}</span>
+              )}
+            </div>
+            <label className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity" title="Upload photo">
+              <Upload className="w-4 h-4" />
+              <input type="file" accept="image/*" className="hidden" onChange={onPhotoChange} disabled={uploading} />
+            </label>
           </div>
           <div>
             <div className="font-display text-2xl">{form.first_name} {form.last_name}</div>
@@ -65,6 +100,7 @@ function ProfileBody() {
               <Badge variant="secondary" className="font-mono">{me.profile?.membership_id}</Badge>
               <Badge variant="secondary" className="capitalize">{me.profile?.status}</Badge>
             </div>
+            {uploading && <p className="text-xs text-muted-foreground mt-2">Uploading photo…</p>}
           </div>
         </div>
 
