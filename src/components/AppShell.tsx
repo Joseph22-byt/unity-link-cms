@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, UserCircle, LogOut, Church, IdCard, Megaphone } from "lucide-react";
+import { LayoutDashboard, Users, UserCircle, LogOut, Church, IdCard, Megaphone, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/messages", label: "Announcements", icon: Megaphone },
+  { to: "/donations", label: "Donations", icon: Heart },
   { to: "/id-card", label: "My ID Card", icon: IdCard },
   { to: "/members", label: "Members", icon: Users },
   { to: "/profile", label: "My Profile", icon: UserCircle },
