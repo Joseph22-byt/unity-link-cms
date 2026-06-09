@@ -1,6 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+async function signPhoto(supabase: any, path: string | null | undefined) {
+  if (!path) return null;
+  const { data } = await supabase.storage.from("member-photos").createSignedUrl(path, 60 * 60);
+  return data?.signedUrl ?? null;
+}
+
 export const getMyProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -9,7 +15,8 @@ export const getMyProfile = createServerFn({ method: "GET" })
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", userId),
     ]);
-    return { profile, roles: (roles ?? []).map((r) => r.role) };
+    const photo_signed_url = await signPhoto(supabase, profile?.photo_url);
+    return { profile, roles: (roles ?? []).map((r) => r.role), photo_signed_url };
   });
 
 export const updateMyProfile = createServerFn({ method: "POST" })
@@ -62,4 +69,43 @@ export const setMemberStatus = createServerFn({ method: "POST" })
     const { error } = await context.supabase.from("profiles").update({ status: data.status }).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+export const saveMyPhoto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { path: string }) => d)
+  .handler(async ({ context, data }) => {
+    if (!data.path.startsWith(`${context.userId}/`)) throw new Error("Invalid photo path");
+    const { error } = await context.supabase.from("profiles").update({ photo_url: data.path }).eq("id", context.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const verifyMembership = createServerFn({ method: "GET" })
+  .inputValidator((d: { membership_id: string }) => d)
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("membership_id, first_name, last_name, ministry, status, photo_url, created_at")
+      .eq("membership_id", data.membership_id)
+      .maybeSingle();
+    if (!profile) return { found: false as const };
+    let photo_signed_url: string | null = null;
+    if (profile.photo_url) {
+      const { data: signed } = await supabaseAdmin.storage.from("member-photos").createSignedUrl(profile.photo_url, 60 * 60);
+      photo_signed_url = signed?.signedUrl ?? null;
+    }
+    return {
+      found: true as const,
+      member: {
+        membership_id: profile.membership_id,
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        ministry: profile.ministry,
+        status: profile.status,
+        member_since: profile.created_at,
+        photo_signed_url,
+      },
+    };
   });

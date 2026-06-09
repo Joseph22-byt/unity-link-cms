@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VerifyMidRouteImport } from './routes/verify.$mid'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedMembersRouteImport } from './routes/_authenticated/members'
+import { Route as AuthenticatedIdCardRouteImport } from './routes/_authenticated/id-card'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const AuthRoute = AuthRouteImport.update({
@@ -30,6 +32,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerifyMidRoute = VerifyMidRouteImport.update({
+  id: '/verify/$mid',
+  path: '/verify/$mid',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -38,6 +45,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
 const AuthenticatedMembersRoute = AuthenticatedMembersRouteImport.update({
   id: '/members',
   path: '/members',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedIdCardRoute = AuthenticatedIdCardRouteImport.update({
+  id: '/id-card',
+  path: '/id-card',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -50,15 +62,19 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/id-card': typeof AuthenticatedIdCardRoute
   '/members': typeof AuthenticatedMembersRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/verify/$mid': typeof VerifyMidRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/id-card': typeof AuthenticatedIdCardRoute
   '/members': typeof AuthenticatedMembersRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/verify/$mid': typeof VerifyMidRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -66,28 +82,47 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/id-card': typeof AuthenticatedIdCardRoute
   '/_authenticated/members': typeof AuthenticatedMembersRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/verify/$mid': typeof VerifyMidRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard' | '/members' | '/profile'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/id-card'
+    | '/members'
+    | '/profile'
+    | '/verify/$mid'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/members' | '/profile'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/id-card'
+    | '/members'
+    | '/profile'
+    | '/verify/$mid'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dashboard'
+    | '/_authenticated/id-card'
     | '/_authenticated/members'
     | '/_authenticated/profile'
+    | '/verify/$mid'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  VerifyMidRoute: typeof VerifyMidRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -113,6 +148,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verify/$mid': {
+      id: '/verify/$mid'
+      path: '/verify/$mid'
+      fullPath: '/verify/$mid'
+      preLoaderRoute: typeof VerifyMidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -127,6 +169,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMembersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/id-card': {
+      id: '/_authenticated/id-card'
+      path: '/id-card'
+      fullPath: '/id-card'
+      preLoaderRoute: typeof AuthenticatedIdCardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -139,12 +188,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedIdCardRoute: typeof AuthenticatedIdCardRoute
   AuthenticatedMembersRoute: typeof AuthenticatedMembersRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedIdCardRoute: AuthenticatedIdCardRoute,
   AuthenticatedMembersRoute: AuthenticatedMembersRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
 }
@@ -156,17 +207,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  VerifyMidRoute: VerifyMidRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
