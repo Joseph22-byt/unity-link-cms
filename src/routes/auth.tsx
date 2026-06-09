@@ -97,7 +97,7 @@ function SignUpForm() {
     <form className="space-y-4" onSubmit={async (e) => {
       e.preventDefault();
       setLoading(true);
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
         options: {
@@ -105,10 +105,23 @@ function SignUpForm() {
           data: { first_name: form.first_name, last_name: form.last_name, phone: form.phone },
         },
       });
-      setLoading(false);
       if (error) return toast.error(error.message);
-      toast.success("Account created — check your email to verify.");
-      navigate({ to: "/auth" });
+      // Auto-confirm is enabled, so a session is returned immediately.
+      if (data.session) {
+        setLoading(false);
+        toast.success("Welcome to Sanctuary");
+        navigate({ to: "/dashboard", replace: true });
+        return;
+      }
+      // Fallback: sign in if no session was returned.
+      const { error: signInErr } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
+      setLoading(false);
+      if (signInErr) {
+        toast.success("Account created — please sign in.");
+        return;
+      }
+      toast.success("Welcome to Sanctuary");
+      navigate({ to: "/dashboard", replace: true });
     }}>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2"><Label>First name</Label><Input required value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} /></div>
