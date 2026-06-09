@@ -10,19 +10,27 @@ import type { ReactNode } from "react";
 
 const STAFF_ROLES = ["super_admin", "admin", "pastor"];
 
-const nav = [
+const baseNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/messages", label: "Announcements", icon: Megaphone },
   { to: "/donations", label: "Donations", icon: Heart },
   { to: "/id-card", label: "My ID Card", icon: IdCard },
   { to: "/members", label: "Members", icon: Users },
   { to: "/profile", label: "My Profile", icon: UserCircle },
-] as const;
+];
 
 export function AppShell({ children, title }: { children: ReactNode; title: string }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const me = useServerFn(getMyProfile);
+  const meQ = useQuery({ queryKey: ["me"], queryFn: () => me() });
+  const isStaff = (meQ.data?.roles ?? []).some((r: string) => STAFF_ROLES.includes(r));
+
+  const nav = isStaff
+    ? [...baseNav, { to: "/requests", label: "Join Requests", icon: ClipboardList }]
+    : baseNav;
 
   async function signOut() {
     await queryClient.cancelQueries();
