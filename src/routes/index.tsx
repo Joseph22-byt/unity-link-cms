@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Church, Heart, Users, Calendar, ShieldCheck, Sparkles } from "lucide-react";
+import { Church, Heart, Users, Calendar, ShieldCheck, Sparkles, LogIn } from "lucide-react";
 import hero from "@/assets/hero-cathedral.jpg";
 
 export const Route = createFileRoute("/")({
