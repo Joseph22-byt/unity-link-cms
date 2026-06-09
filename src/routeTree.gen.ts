@@ -17,6 +17,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedMembersRouteImport } from './routes/_authenticated/members'
 import { Route as AuthenticatedIdCardRouteImport } from './routes/_authenticated/id-card'
+import { Route as AuthenticatedDonationsRouteImport } from './routes/_authenticated/donations'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const AuthRoute = AuthRouteImport.update({
@@ -58,6 +59,11 @@ const AuthenticatedIdCardRoute = AuthenticatedIdCardRouteImport.update({
   path: '/id-card',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDonationsRoute = AuthenticatedDonationsRouteImport.update({
+  id: '/donations',
+  path: '/donations',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/donations': typeof AuthenticatedDonationsRoute
   '/id-card': typeof AuthenticatedIdCardRoute
   '/members': typeof AuthenticatedMembersRoute
   '/messages': typeof AuthenticatedMessagesRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/donations': typeof AuthenticatedDonationsRoute
   '/id-card': typeof AuthenticatedIdCardRoute
   '/members': typeof AuthenticatedMembersRoute
   '/messages': typeof AuthenticatedMessagesRoute
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/donations': typeof AuthenticatedDonationsRoute
   '/_authenticated/id-card': typeof AuthenticatedIdCardRoute
   '/_authenticated/members': typeof AuthenticatedMembersRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
@@ -102,6 +111,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/donations'
     | '/id-card'
     | '/members'
     | '/messages'
@@ -112,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/donations'
     | '/id-card'
     | '/members'
     | '/messages'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dashboard'
+    | '/_authenticated/donations'
     | '/_authenticated/id-card'
     | '/_authenticated/members'
     | '/_authenticated/messages'
@@ -195,6 +207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIdCardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/donations': {
+      id: '/_authenticated/donations'
+      path: '/donations'
+      fullPath: '/donations'
+      preLoaderRoute: typeof AuthenticatedDonationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -207,6 +226,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDonationsRoute: typeof AuthenticatedDonationsRoute
   AuthenticatedIdCardRoute: typeof AuthenticatedIdCardRoute
   AuthenticatedMembersRoute: typeof AuthenticatedMembersRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
@@ -215,6 +235,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDonationsRoute: AuthenticatedDonationsRoute,
   AuthenticatedIdCardRoute: AuthenticatedIdCardRoute,
   AuthenticatedMembersRoute: AuthenticatedMembersRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
@@ -233,3 +254,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
