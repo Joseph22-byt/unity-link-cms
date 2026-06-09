@@ -36,11 +36,13 @@ function JoinPage() {
     setLoading(true);
     try {
       await submitMembershipRequest({
-        full_name: form.full_name.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim() || undefined,
-        requested_role: form.requested_role,
-        message: form.message.trim() || undefined,
+        data: {
+          full_name: form.full_name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim() || undefined,
+          requested_role: form.requested_role,
+          message: form.message.trim() || undefined,
+        },
       });
       toast.success("Request submitted successfully!");
       setSubmitted(true);
