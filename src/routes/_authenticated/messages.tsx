@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/messages")({
   notFoundComponent: () => <div className="p-6">Not found</div>,
 });
 
-const STAFF_ROLES = ["super_admin", "admin", "pastor"];
+const STAFF_ROLES = ["super_admin", "admin"];
 
 function MessagesPage() {
   const router = useRouter();
