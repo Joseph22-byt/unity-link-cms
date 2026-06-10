@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/donations")({
   notFoundComponent: () => <div className="p-6">Not found</div>,
 });
 
-const STAFF_ROLES = ["super_admin", "admin", "pastor"];
+const STAFF_ROLES = ["super_admin", "admin"];
 
 function DonationsPage() {
   const me = useServerFn(getMyProfile);
