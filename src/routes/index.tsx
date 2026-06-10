@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Church, Heart, Users, Calendar, ShieldCheck, Sparkles, LogIn, User } from "lucide-react";
+import { Church, Heart, Users, Calendar, ShieldCheck, Sparkles, LogIn } from "lucide-react";
 import hero from "@/assets/hero-cathedral.jpg";
 
 export const Route = createFileRoute("/")({
@@ -45,19 +45,14 @@ function Index() {
             Sanctuary brings members, ministries, attendance, and giving into one quiet, beautiful place — so you can spend more time on what matters.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link to="/join">
+            <Link to="/auth">
               <Button size="lg" className="bg-gold text-ink hover:bg-gold-soft h-12 px-7 text-base font-medium flex items-center gap-2">
-                <User className="w-4 h-4" /> Request to Join
+                <ShieldCheck className="w-4 h-4" /> Pastor / Admin Login
               </Button>
             </Link>
             <Link to="/auth">
               <Button size="lg" variant="outline" className="h-12 px-7 text-base bg-transparent border-background/30 text-background hover:bg-background/10 hover:text-background flex items-center gap-2">
                 <LogIn className="w-4 h-4" /> Member Login
-              </Button>
-            </Link>
-            <Link to="/auth">
-              <Button size="lg" variant="outline" className="h-12 px-7 text-base bg-transparent border-background/30 text-background hover:bg-background/10 hover:text-background flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4" /> Staff / Admin Login
               </Button>
             </Link>
           </div>
