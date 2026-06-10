@@ -25,7 +25,12 @@ export function AppShell({ children, title }: { children: ReactNode; title: stri
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const me = useServerFn(getMyProfile);
-  const meQ = useQuery({ queryKey: ["me"], queryFn: () => me() });
+  const meQ = useQuery({
+    queryKey: ["me"],
+    queryFn: () => me(),
+    retry: false,
+    throwOnError: false,
+  });
   const isStaff = (meQ.data?.roles ?? []).some((r: string) => STAFF_ROLES.includes(r));
 
   const nav = isStaff
