@@ -14,6 +14,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VerifyMidRouteImport } from './routes/verify.$mid'
+import { Route as AuthMemberRouteImport } from './routes/auth.member'
+import { Route as AuthAdminRouteImport } from './routes/auth.admin'
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
@@ -45,6 +47,16 @@ const VerifyMidRoute = VerifyMidRouteImport.update({
   id: '/verify/$mid',
   path: '/verify/$mid',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthMemberRoute = AuthMemberRouteImport.update({
+  id: '/member',
+  path: '/member',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthAdminRoute = AuthAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthenticatedRequestsRoute = AuthenticatedRequestsRouteImport.update({
   id: '/requests',
@@ -84,7 +96,7 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/join': typeof JoinRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/donations': typeof AuthenticatedDonationsRoute
@@ -93,11 +105,13 @@ export interface FileRoutesByFullPath {
   '/messages': typeof AuthenticatedMessagesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/requests': typeof AuthenticatedRequestsRoute
+  '/auth/admin': typeof AuthAdminRoute
+  '/auth/member': typeof AuthMemberRoute
   '/verify/$mid': typeof VerifyMidRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/join': typeof JoinRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/donations': typeof AuthenticatedDonationsRoute
@@ -106,13 +120,15 @@ export interface FileRoutesByTo {
   '/messages': typeof AuthenticatedMessagesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/requests': typeof AuthenticatedRequestsRoute
+  '/auth/admin': typeof AuthAdminRoute
+  '/auth/member': typeof AuthMemberRoute
   '/verify/$mid': typeof VerifyMidRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/join': typeof JoinRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/donations': typeof AuthenticatedDonationsRoute
@@ -121,6 +137,8 @@ export interface FileRoutesById {
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRoute
+  '/auth/admin': typeof AuthAdminRoute
+  '/auth/member': typeof AuthMemberRoute
   '/verify/$mid': typeof VerifyMidRoute
 }
 export interface FileRouteTypes {
@@ -136,6 +154,8 @@ export interface FileRouteTypes {
     | '/messages'
     | '/profile'
     | '/requests'
+    | '/auth/admin'
+    | '/auth/member'
     | '/verify/$mid'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -149,6 +169,8 @@ export interface FileRouteTypes {
     | '/messages'
     | '/profile'
     | '/requests'
+    | '/auth/admin'
+    | '/auth/member'
     | '/verify/$mid'
   id:
     | '__root__'
@@ -163,13 +185,15 @@ export interface FileRouteTypes {
     | '/_authenticated/messages'
     | '/_authenticated/profile'
     | '/_authenticated/requests'
+    | '/auth/admin'
+    | '/auth/member'
     | '/verify/$mid'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   JoinRoute: typeof JoinRoute
   VerifyMidRoute: typeof VerifyMidRoute
 }
@@ -210,6 +234,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/verify/$mid'
       preLoaderRoute: typeof VerifyMidRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/auth/member': {
+      id: '/auth/member'
+      path: '/member'
+      fullPath: '/auth/member'
+      preLoaderRoute: typeof AuthMemberRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/admin': {
+      id: '/auth/admin'
+      path: '/admin'
+      fullPath: '/auth/admin'
+      preLoaderRoute: typeof AuthAdminRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_authenticated/requests': {
       id: '/_authenticated/requests'
@@ -286,10 +324,22 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthAdminRoute: typeof AuthAdminRoute
+  AuthMemberRoute: typeof AuthMemberRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthAdminRoute: AuthAdminRoute,
+  AuthMemberRoute: AuthMemberRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   JoinRoute: JoinRoute,
   VerifyMidRoute: VerifyMidRoute,
 }

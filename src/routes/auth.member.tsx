@@ -1,15 +1,22 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import { Church } from "lucide-react";
 
-export const Route = createFileRoute("/auth")({
-  beforeLoad: () => {
-    throw redirect({ to: "/auth/member", replace: true });
-  },
-  component: () => null,
+export const Route = createFileRoute("/auth/member")({
+  head: () => ({ meta: [{ title: "Member Portal — Sanctuary" }] }),
+  component: MemberAuthPage,
 });
 
-function AuthPage() {
+function MemberAuthPage() {
   const navigate = useNavigate();
-
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/dashboard", replace: true });
@@ -34,7 +41,7 @@ function AuthPage() {
       </div>
       <div className="flex-1 flex items-center justify-center p-6 md:p-12">
         <Card className="w-full max-w-md p-8 border-border">
-          <h1 className="font-display text-3xl mb-1">Welcome</h1>
+          <h1 className="font-display text-3xl mb-1">Member Portal</h1>
           <p className="text-sm text-muted-foreground mb-8">Sign in to your member portal, or join the community.</p>
           <Tabs defaultValue="signin">
             <TabsList className="grid grid-cols-2 w-full mb-6">
@@ -53,6 +60,9 @@ function AuthPage() {
           }}>
             Continue with Google
           </Button>
+          <p className="text-xs text-muted-foreground mt-6 text-center">
+            Pastor or admin? <Link to="/auth/admin" className="text-gold hover:underline">Admin portal</Link>
+          </p>
         </Card>
       </div>
     </div>
@@ -74,8 +84,8 @@ function SignInForm() {
       toast.success("Welcome back");
       navigate({ to: "/dashboard", replace: true });
     }}>
-      <div className="space-y-2"><Label htmlFor="si-email">Email</Label><Input id="si-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-      <div className="space-y-2"><Label htmlFor="si-pw">Password</Label><Input id="si-pw" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+      <div className="space-y-2"><Label>Email</Label><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+      <div className="space-y-2"><Label>Password</Label><Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} /></div>
       <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground">{loading ? "Signing in…" : "Sign in"}</Button>
     </form>
   );
@@ -97,21 +107,16 @@ function SignUpForm() {
           data: { first_name: form.first_name, last_name: form.last_name, phone: form.phone },
         },
       });
-      if (error) return toast.error(error.message);
-      // Auto-confirm is enabled, so a session is returned immediately.
+      if (error) { setLoading(false); return toast.error(error.message); }
       if (data.session) {
         setLoading(false);
         toast.success("Welcome to Sanctuary");
         navigate({ to: "/dashboard", replace: true });
         return;
       }
-      // Fallback: sign in if no session was returned.
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
       setLoading(false);
-      if (signInErr) {
-        toast.success("Account created — please sign in.");
-        return;
-      }
+      if (signInErr) { toast.success("Account created — please sign in."); return; }
       toast.success("Welcome to Sanctuary");
       navigate({ to: "/dashboard", replace: true });
     }}>
