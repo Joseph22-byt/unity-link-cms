@@ -52,7 +52,7 @@ export function AppShell({ children, title }: { children: ReactNode; title: stri
             <Church className="w-5 h-5 text-ink" />
           </div>
           <div>
-            <div className="font-display text-lg leading-none">Sanctuary</div>
+            <div className="font-display text-lg leading-none">Jessa Thetraravalar Ministries</div>
             <div className="text-xs opacity-60 mt-1">Church Management</div>
           </div>
         </div>

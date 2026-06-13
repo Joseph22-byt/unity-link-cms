@@ -9,7 +9,7 @@ import { getMyProfile, getStats } from "@/lib/members.functions";
 import { Users, UserCheck, UserPlus, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — Sanctuary" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — Jessa Thetraravalar Ministries" }] }),
   component: DashboardPage,
 });
 

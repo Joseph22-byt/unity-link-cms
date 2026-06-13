@@ -11,7 +11,7 @@ import { Download, Printer } from "lucide-react";
 import { toPng } from "html-to-image";
 
 export const Route = createFileRoute("/_authenticated/id-card")({
-  head: () => ({ meta: [{ title: "My ID Card — Sanctuary" }] }),
+  head: () => ({ meta: [{ title: "My ID Card — Jessa Thetraravalar Ministries" }] }),
   component: () => (
     <AppShell title="My Digital ID Card">
       <Suspense fallback={<div className="text-muted-foreground">Loading…</div>}>

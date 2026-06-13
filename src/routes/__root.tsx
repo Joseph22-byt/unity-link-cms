@@ -79,9 +79,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Sanctuary — Church Management" },
+      { title: "Jessa Thetraravalar Ministries — Church Management" },
       { name: "description", content: "A modern, reverent platform for member care, attendance, giving, and ministry." },
-      { property: "og:title", content: "Sanctuary — Church Management" },
+      { property: "og:title", content: "Jessa Thetraravalar Ministries — Church Management" },
       { property: "og:description", content: "Member care, attendance, giving, and ministry — beautifully managed." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

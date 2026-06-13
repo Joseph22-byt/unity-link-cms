@@ -11,7 +11,7 @@ import { listMembers, setMemberStatus, getMyProfile } from "@/lib/members.functi
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/members")({
-  head: () => ({ meta: [{ title: "Members — Sanctuary" }] }),
+  head: () => ({ meta: [{ title: "Members — Jessa Thetraravalar Ministries" }] }),
   component: MembersPage,
 });
 
