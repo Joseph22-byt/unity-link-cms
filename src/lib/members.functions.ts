@@ -66,6 +66,8 @@ export const setMemberStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string; status: "pending" | "active" | "inactive" }) => d)
   .handler(async ({ context, data }) => {
+    const { data: isStaff } = await context.supabase.rpc("is_staff", { _user_id: context.userId });
+    if (!isStaff) throw new Error("Forbidden");
     const { error } = await context.supabase.from("profiles").update({ status: data.status }).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
