@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { MemberIdCard } from "@/components/MemberIdCard";
 import { getMyProfile } from "@/lib/members.functions";
 import { Download, Printer } from "lucide-react";
-import html2canvas from "html2canvas";
+import { toPng } from "html-to-image";
 
 export const Route = createFileRoute("/_authenticated/id-card")({
   head: () => ({ meta: [{ title: "My ID Card — Sanctuary" }] }),
@@ -33,11 +33,19 @@ function Body() {
 
   async function download() {
     if (!cardRef.current) return;
-    const canvas = await html2canvas(cardRef.current, { scale: 3, backgroundColor: null, useCORS: true });
-    const link = document.createElement("a");
-    link.download = `${me.profile?.membership_id ?? "id-card"}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+    try {
+      const dataUrl = await toPng(cardRef.current, {
+        pixelRatio: 3,
+        cacheBust: true,
+        skipFonts: false,
+      });
+      const link = document.createElement("a");
+      link.download = `${me.profile?.membership_id ?? "id-card"}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error("ID card download failed", err);
+    }
   }
 
   return (

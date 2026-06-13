@@ -49,7 +49,7 @@ export function MemberIdCard({ member, verifyUrl }: { member: Member; verifyUrl:
         <div className="flex-1 flex items-center gap-4 mt-3">
           <div className="w-20 h-24 rounded-md overflow-hidden flex-shrink-0 bg-background/10 border border-background/20 flex items-center justify-center font-display text-2xl">
             {member.photo_signed_url ? (
-              <img src={member.photo_signed_url} alt="" className="w-full h-full object-cover" />
+              <img src={member.photo_signed_url} alt="" crossOrigin="anonymous" className="w-full h-full object-cover" />
             ) : (
               <span className="text-gold">{initials || "·"}</span>
             )}
