@@ -10,9 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as JoinRouteImport } from './routes/join'
-import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthIndexRouteImport } from './routes/auth.index'
 import { Route as VerifyMidRouteImport } from './routes/verify.$mid'
 import { Route as AuthMemberRouteImport } from './routes/auth.member'
 import { Route as AuthAdminRouteImport } from './routes/auth.admin'
@@ -29,11 +29,6 @@ const JoinRoute = JoinRouteImport.update({
   path: '/join',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -43,20 +38,25 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthIndexRoute = AuthIndexRouteImport.update({
+  id: '/auth/',
+  path: '/auth/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VerifyMidRoute = VerifyMidRouteImport.update({
   id: '/verify/$mid',
   path: '/verify/$mid',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthMemberRoute = AuthMemberRouteImport.update({
-  id: '/member',
-  path: '/member',
-  getParentRoute: () => AuthRoute,
+  id: '/auth/member',
+  path: '/auth/member',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthAdminRoute = AuthAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthRoute,
+  id: '/auth/admin',
+  path: '/auth/admin',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRequestsRoute = AuthenticatedRequestsRouteImport.update({
   id: '/requests',
@@ -96,7 +96,6 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRouteWithChildren
   '/join': typeof JoinRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/donations': typeof AuthenticatedDonationsRoute
@@ -108,10 +107,10 @@ export interface FileRoutesByFullPath {
   '/auth/admin': typeof AuthAdminRoute
   '/auth/member': typeof AuthMemberRoute
   '/verify/$mid': typeof VerifyMidRoute
+  '/auth/': typeof AuthIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRouteWithChildren
   '/join': typeof JoinRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/donations': typeof AuthenticatedDonationsRoute
@@ -123,12 +122,12 @@ export interface FileRoutesByTo {
   '/auth/admin': typeof AuthAdminRoute
   '/auth/member': typeof AuthMemberRoute
   '/verify/$mid': typeof VerifyMidRoute
+  '/auth': typeof AuthIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRouteWithChildren
   '/join': typeof JoinRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/donations': typeof AuthenticatedDonationsRoute
@@ -140,12 +139,12 @@ export interface FileRoutesById {
   '/auth/admin': typeof AuthAdminRoute
   '/auth/member': typeof AuthMemberRoute
   '/verify/$mid': typeof VerifyMidRoute
+  '/auth/': typeof AuthIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/auth'
     | '/join'
     | '/dashboard'
     | '/donations'
@@ -157,10 +156,10 @@ export interface FileRouteTypes {
     | '/auth/admin'
     | '/auth/member'
     | '/verify/$mid'
+    | '/auth/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth'
     | '/join'
     | '/dashboard'
     | '/donations'
@@ -172,11 +171,11 @@ export interface FileRouteTypes {
     | '/auth/admin'
     | '/auth/member'
     | '/verify/$mid'
+    | '/auth'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/auth'
     | '/join'
     | '/_authenticated/dashboard'
     | '/_authenticated/donations'
@@ -188,14 +187,17 @@ export interface FileRouteTypes {
     | '/auth/admin'
     | '/auth/member'
     | '/verify/$mid'
+    | '/auth/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRouteWithChildren
   JoinRoute: typeof JoinRoute
+  AuthAdminRoute: typeof AuthAdminRoute
+  AuthMemberRoute: typeof AuthMemberRoute
   VerifyMidRoute: typeof VerifyMidRoute
+  AuthIndexRoute: typeof AuthIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -205,13 +207,6 @@ declare module '@tanstack/react-router' {
       path: '/join'
       fullPath: '/join'
       preLoaderRoute: typeof JoinRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -228,6 +223,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/': {
+      id: '/auth/'
+      path: '/auth'
+      fullPath: '/auth/'
+      preLoaderRoute: typeof AuthIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/verify/$mid': {
       id: '/verify/$mid'
       path: '/verify/$mid'
@@ -237,17 +239,17 @@ declare module '@tanstack/react-router' {
     }
     '/auth/member': {
       id: '/auth/member'
-      path: '/member'
+      path: '/auth/member'
       fullPath: '/auth/member'
       preLoaderRoute: typeof AuthMemberRouteImport
-      parentRoute: typeof AuthRoute
+      parentRoute: typeof rootRouteImport
     }
     '/auth/admin': {
       id: '/auth/admin'
-      path: '/admin'
+      path: '/auth/admin'
       fullPath: '/auth/admin'
       preLoaderRoute: typeof AuthAdminRouteImport
-      parentRoute: typeof AuthRoute
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/requests': {
       id: '/_authenticated/requests'
@@ -324,24 +326,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface AuthRouteChildren {
-  AuthAdminRoute: typeof AuthAdminRoute
-  AuthMemberRoute: typeof AuthMemberRoute
-}
-
-const AuthRouteChildren: AuthRouteChildren = {
-  AuthAdminRoute: AuthAdminRoute,
-  AuthMemberRoute: AuthMemberRoute,
-}
-
-const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRouteWithChildren,
   JoinRoute: JoinRoute,
+  AuthAdminRoute: AuthAdminRoute,
+  AuthMemberRoute: AuthMemberRoute,
   VerifyMidRoute: VerifyMidRoute,
+  AuthIndexRoute: AuthIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

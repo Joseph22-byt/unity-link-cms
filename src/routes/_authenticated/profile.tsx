@@ -14,7 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Upload } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "My Profile — Sanctuary" }] }),
+  head: () => ({ meta: [{ title: "My Profile — Jessa Thetraravalar Ministries" }] }),
   component: ProfilePage,
 });
 

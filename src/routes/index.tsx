@@ -7,9 +7,9 @@ import hero from "@/assets/hero-cathedral.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sanctuary — Modern Church Management" },
+      { title: "Jessa Thetraravalar Ministries — Modern Church Management" },
       { name: "description", content: "Care for every member with reverent, modern tools — attendance, giving, ministries, and digital ID cards." },
-      { property: "og:title", content: "Sanctuary — Modern Church Management" },
+      { property: "og:title", content: "Jessa Thetraravalar Ministries — Modern Church Management" },
       { property: "og:description", content: "Care for every member with reverent, modern tools." },
     ],
   }),
@@ -24,7 +24,7 @@ function Index() {
           <div className="w-9 h-9 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-gold)" }}>
             <Church className="w-5 h-5 text-ink" />
           </div>
-          <span className="font-display text-xl text-background">Sanctuary</span>
+          <span className="font-display text-xl text-background">Jessa Thetraravalar Ministries</span>
         </div>
         <Link to="/auth">
           <Button variant="ghost" className="text-background hover:bg-background/10 hover:text-background">Sign in</Button>
@@ -42,7 +42,7 @@ function Index() {
             Shepherd your congregation with reverence and clarity.
           </h1>
           <p className="mt-6 max-w-xl text-base md:text-lg text-background/80">
-            Sanctuary brings members, ministries, attendance, and giving into one quiet, beautiful place — so you can spend more time on what matters.
+            Jessa Thetraravalar Ministries brings members, ministries, attendance, and giving into one quiet, beautiful place — so you can spend more time on what matters.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link to="/auth/admin">
@@ -81,7 +81,7 @@ function Index() {
       </section>
 
       <footer className="border-t border-border py-10 px-6 text-center text-sm text-muted-foreground">
-        Built with care · Sanctuary Church Management
+        Built with care · Jessa Thetraravalar Ministries Church Management
       </footer>
     </div>
   );

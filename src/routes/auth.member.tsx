@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { Church } from "lucide-react";
 
 export const Route = createFileRoute("/auth/member")({
-  head: () => ({ meta: [{ title: "Member Portal — Sanctuary" }] }),
+  head: () => ({ meta: [{ title: "Member Portal — Jessa Thetraravalar Ministries" }] }),
   component: MemberAuthPage,
 });
 
@@ -31,7 +31,7 @@ function MemberAuthPage() {
             <div className="w-9 h-9 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-gold)" }}>
               <Church className="w-5 h-5 text-ink" />
             </div>
-            <span className="font-display text-xl">Sanctuary</span>
+            <span className="font-display text-xl">Jessa Thetraravalar Ministries</span>
           </Link>
           <blockquote className="font-display text-3xl leading-tight max-w-md">
             "Behold, how good and how pleasant it is for brethren to dwell together in unity."
@@ -110,14 +110,14 @@ function SignUpForm() {
       if (error) { setLoading(false); return toast.error(error.message); }
       if (data.session) {
         setLoading(false);
-        toast.success("Welcome to Sanctuary");
+        toast.success("Welcome to Jessa Thetraravalar Ministries");
         navigate({ to: "/dashboard", replace: true });
         return;
       }
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
       setLoading(false);
       if (signInErr) { toast.success("Account created — please sign in."); return; }
-      toast.success("Welcome to Sanctuary");
+      toast.success("Welcome to Jessa Thetraravalar Ministries");
       navigate({ to: "/dashboard", replace: true });
     }}>
       <div className="grid grid-cols-2 gap-3">

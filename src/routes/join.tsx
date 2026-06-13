@@ -13,8 +13,8 @@ import { submitMembershipRequest } from "@/lib/membership-requests.functions";
 export const Route = createFileRoute("/join")({
   head: () => ({
     meta: [
-      { title: "Join Sanctuary — Church Management" },
-      { name: "description", content: "Request membership or pastoral access at Sanctuary." },
+      { title: "Join Jessa Thetraravalar Ministries — Church Management" },
+      { name: "description", content: "Request membership or pastoral access at Jessa Thetraravalar Ministries." },
     ],
   }),
   component: JoinPage,
@@ -77,7 +77,7 @@ function JoinPage() {
           <div className="w-9 h-9 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-gold)" }}>
             <Church className="w-5 h-5 text-ink" />
           </div>
-          <span className="font-display text-xl">Sanctuary</span>
+          <span className="font-display text-xl">Jessa Thetraravalar Ministries</span>
         </Link>
         <Link to="/auth">
           <Button variant="ghost">Sign in</Button>

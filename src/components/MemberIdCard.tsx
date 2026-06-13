@@ -37,7 +37,7 @@ export function MemberIdCard({ member, verifyUrl }: { member: Member; verifyUrl:
               <Church className="w-3.5 h-3.5 text-ink" />
             </div>
             <div>
-              <div className="font-display text-sm leading-none">Sanctuary</div>
+              <div className="font-display text-sm leading-none">Jessa Thetraravalar Ministries</div>
               <div className="text-[9px] uppercase tracking-[0.2em] opacity-60 mt-0.5">Member Card</div>
             </div>
           </div>

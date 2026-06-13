@@ -10,8 +10,8 @@ import { ShieldCheck, ShieldAlert, Church } from "lucide-react";
 export const Route = createFileRoute("/verify/$mid")({
   head: ({ params }) => ({
     meta: [
-      { title: `Verify ${params.mid} — Sanctuary` },
-      { name: "description", content: "Membership verification for Sanctuary Church." },
+      { title: `Verify ${params.mid} — Jessa Thetraravalar Ministries` },
+      { name: "description", content: "Membership verification for Jessa Thetraravalar Ministries Church." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -56,7 +56,7 @@ function Body() {
         <MemberIdCard member={m} verifyUrl={typeof window !== "undefined" ? window.location.href : ""} />
       </div>
 
-      <p className="text-xs text-center text-muted-foreground">Verified by Sanctuary Church Management.</p>
+      <p className="text-xs text-center text-muted-foreground">Verified by Jessa Thetraravalar Ministries Church Management.</p>
     </div>
   );
 }
@@ -78,7 +78,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <div className="w-9 h-9 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-gold)" }}>
           <Church className="w-5 h-5 text-ink" />
         </div>
-        <div className="font-display text-xl">Sanctuary</div>
+        <div className="font-display text-xl">Jessa Thetraravalar Ministries</div>
       </Link>
       {children}
     </div>

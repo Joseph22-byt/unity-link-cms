@@ -12,7 +12,7 @@ import { Church, ShieldCheck } from "lucide-react";
 import { signUpAdmin } from "@/lib/admin-signup.functions";
 
 export const Route = createFileRoute("/auth/admin")({
-  head: () => ({ meta: [{ title: "Pastor / Admin Portal — Sanctuary" }] }),
+  head: () => ({ meta: [{ title: "Pastor / Admin Portal — Jessa Thetraravalar Ministries" }] }),
   component: AdminAuthPage,
 });
 
@@ -32,7 +32,7 @@ function AdminAuthPage() {
             <div className="w-9 h-9 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-gold)" }}>
               <Church className="w-5 h-5 text-ink" />
             </div>
-            <span className="font-display text-xl">Sanctuary</span>
+            <span className="font-display text-xl">Jessa Thetraravalar Ministries</span>
           </Link>
           <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-gold mb-4">
             <ShieldCheck className="w-3.5 h-3.5" /> Pastoral Leadership
