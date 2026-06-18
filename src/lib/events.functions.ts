@@ -111,7 +111,7 @@ export const updateEventPhotos = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: isStaff } = await supabase.rpc("is_staff", { _user_id: userId });
     if (!isStaff) throw new Error("Forbidden");
-    const patch: Record<string, unknown> = {};
+    const patch: { cover_photo_url?: string | null; photo_urls?: string[] } = {};
     if (data.cover_photo_url !== undefined) patch.cover_photo_url = data.cover_photo_url;
     if (data.photo_urls !== undefined) patch.photo_urls = data.photo_urls;
     const { error } = await supabase.from("events").update(patch).eq("id", data.id);
