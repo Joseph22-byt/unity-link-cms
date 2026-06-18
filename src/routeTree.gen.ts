@@ -21,6 +21,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedMembersRouteImport } from './routes/_authenticated/members'
 import { Route as AuthenticatedIdCardRouteImport } from './routes/_authenticated/id-card'
+import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedDonationsRouteImport } from './routes/_authenticated/donations'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
@@ -83,6 +84,11 @@ const AuthenticatedIdCardRoute = AuthenticatedIdCardRouteImport.update({
   path: '/id-card',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDonationsRoute = AuthenticatedDonationsRouteImport.update({
   id: '/donations',
   path: '/donations',
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/join': typeof JoinRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/donations': typeof AuthenticatedDonationsRoute
+  '/events': typeof AuthenticatedEventsRoute
   '/id-card': typeof AuthenticatedIdCardRoute
   '/members': typeof AuthenticatedMembersRoute
   '/messages': typeof AuthenticatedMessagesRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/join': typeof JoinRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/donations': typeof AuthenticatedDonationsRoute
+  '/events': typeof AuthenticatedEventsRoute
   '/id-card': typeof AuthenticatedIdCardRoute
   '/members': typeof AuthenticatedMembersRoute
   '/messages': typeof AuthenticatedMessagesRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/join': typeof JoinRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/donations': typeof AuthenticatedDonationsRoute
+  '/_authenticated/events': typeof AuthenticatedEventsRoute
   '/_authenticated/id-card': typeof AuthenticatedIdCardRoute
   '/_authenticated/members': typeof AuthenticatedMembersRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/dashboard'
     | '/donations'
+    | '/events'
     | '/id-card'
     | '/members'
     | '/messages'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/dashboard'
     | '/donations'
+    | '/events'
     | '/id-card'
     | '/members'
     | '/messages'
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/_authenticated/dashboard'
     | '/_authenticated/donations'
+    | '/_authenticated/events'
     | '/_authenticated/id-card'
     | '/_authenticated/members'
     | '/_authenticated/messages'
@@ -286,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIdCardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/events': {
+      id: '/_authenticated/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof AuthenticatedEventsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/donations': {
       id: '/_authenticated/donations'
       path: '/donations'
@@ -306,6 +325,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDonationsRoute: typeof AuthenticatedDonationsRoute
+  AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
   AuthenticatedIdCardRoute: typeof AuthenticatedIdCardRoute
   AuthenticatedMembersRoute: typeof AuthenticatedMembersRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
@@ -316,6 +336,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDonationsRoute: AuthenticatedDonationsRoute,
+  AuthenticatedEventsRoute: AuthenticatedEventsRoute,
   AuthenticatedIdCardRoute: AuthenticatedIdCardRoute,
   AuthenticatedMembersRoute: AuthenticatedMembersRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
