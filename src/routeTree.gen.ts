@@ -21,8 +21,10 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedMembersRouteImport } from './routes/_authenticated/members'
 import { Route as AuthenticatedIdCardRouteImport } from './routes/_authenticated/id-card'
+import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedDonationsRouteImport } from './routes/_authenticated/donations'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedEventsIdRouteImport } from './routes/_authenticated/events.$id'
 
 const JoinRoute = JoinRouteImport.update({
   id: '/join',
@@ -83,6 +85,11 @@ const AuthenticatedIdCardRoute = AuthenticatedIdCardRouteImport.update({
   path: '/id-card',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDonationsRoute = AuthenticatedDonationsRouteImport.update({
   id: '/donations',
   path: '/donations',
@@ -93,12 +100,18 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEventsIdRoute = AuthenticatedEventsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedEventsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/donations': typeof AuthenticatedDonationsRoute
+  '/events': typeof AuthenticatedEventsRouteWithChildren
   '/id-card': typeof AuthenticatedIdCardRoute
   '/members': typeof AuthenticatedMembersRoute
   '/messages': typeof AuthenticatedMessagesRoute
@@ -108,12 +121,14 @@ export interface FileRoutesByFullPath {
   '/auth/member': typeof AuthMemberRoute
   '/verify/$mid': typeof VerifyMidRoute
   '/auth/': typeof AuthIndexRoute
+  '/events/$id': typeof AuthenticatedEventsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/donations': typeof AuthenticatedDonationsRoute
+  '/events': typeof AuthenticatedEventsRouteWithChildren
   '/id-card': typeof AuthenticatedIdCardRoute
   '/members': typeof AuthenticatedMembersRoute
   '/messages': typeof AuthenticatedMessagesRoute
@@ -123,6 +138,7 @@ export interface FileRoutesByTo {
   '/auth/member': typeof AuthMemberRoute
   '/verify/$mid': typeof VerifyMidRoute
   '/auth': typeof AuthIndexRoute
+  '/events/$id': typeof AuthenticatedEventsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -131,6 +147,7 @@ export interface FileRoutesById {
   '/join': typeof JoinRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/donations': typeof AuthenticatedDonationsRoute
+  '/_authenticated/events': typeof AuthenticatedEventsRouteWithChildren
   '/_authenticated/id-card': typeof AuthenticatedIdCardRoute
   '/_authenticated/members': typeof AuthenticatedMembersRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
@@ -140,6 +157,7 @@ export interface FileRoutesById {
   '/auth/member': typeof AuthMemberRoute
   '/verify/$mid': typeof VerifyMidRoute
   '/auth/': typeof AuthIndexRoute
+  '/_authenticated/events/$id': typeof AuthenticatedEventsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -148,6 +166,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/dashboard'
     | '/donations'
+    | '/events'
     | '/id-card'
     | '/members'
     | '/messages'
@@ -157,12 +176,14 @@ export interface FileRouteTypes {
     | '/auth/member'
     | '/verify/$mid'
     | '/auth/'
+    | '/events/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/join'
     | '/dashboard'
     | '/donations'
+    | '/events'
     | '/id-card'
     | '/members'
     | '/messages'
@@ -172,6 +193,7 @@ export interface FileRouteTypes {
     | '/auth/member'
     | '/verify/$mid'
     | '/auth'
+    | '/events/$id'
   id:
     | '__root__'
     | '/'
@@ -179,6 +201,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/_authenticated/dashboard'
     | '/_authenticated/donations'
+    | '/_authenticated/events'
     | '/_authenticated/id-card'
     | '/_authenticated/members'
     | '/_authenticated/messages'
@@ -188,6 +211,7 @@ export interface FileRouteTypes {
     | '/auth/member'
     | '/verify/$mid'
     | '/auth/'
+    | '/_authenticated/events/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -286,6 +310,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIdCardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/events': {
+      id: '/_authenticated/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof AuthenticatedEventsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/donations': {
       id: '/_authenticated/donations'
       path: '/donations'
@@ -300,12 +331,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/events/$id': {
+      id: '/_authenticated/events/$id'
+      path: '/$id'
+      fullPath: '/events/$id'
+      preLoaderRoute: typeof AuthenticatedEventsIdRouteImport
+      parentRoute: typeof AuthenticatedEventsRoute
+    }
   }
 }
+
+interface AuthenticatedEventsRouteChildren {
+  AuthenticatedEventsIdRoute: typeof AuthenticatedEventsIdRoute
+}
+
+const AuthenticatedEventsRouteChildren: AuthenticatedEventsRouteChildren = {
+  AuthenticatedEventsIdRoute: AuthenticatedEventsIdRoute,
+}
+
+const AuthenticatedEventsRouteWithChildren =
+  AuthenticatedEventsRoute._addFileChildren(AuthenticatedEventsRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDonationsRoute: typeof AuthenticatedDonationsRoute
+  AuthenticatedEventsRoute: typeof AuthenticatedEventsRouteWithChildren
   AuthenticatedIdCardRoute: typeof AuthenticatedIdCardRoute
   AuthenticatedMembersRoute: typeof AuthenticatedMembersRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
@@ -316,6 +366,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDonationsRoute: AuthenticatedDonationsRoute,
+  AuthenticatedEventsRoute: AuthenticatedEventsRouteWithChildren,
   AuthenticatedIdCardRoute: AuthenticatedIdCardRoute,
   AuthenticatedMembersRoute: AuthenticatedMembersRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
