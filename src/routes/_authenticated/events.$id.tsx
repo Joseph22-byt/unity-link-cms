@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -73,17 +73,16 @@ function EventDetailPage() {
 
   // Prefill from profile
   const profile = meQ.data?.profile;
-  if (profile && !form.full_name && !form.email) {
+  useEffect(() => {
+    if (!profile) return;
     const fn = `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim();
-    if (fn || profile.email || profile.phone) {
-      setForm((f) => ({
-        ...f,
-        full_name: f.full_name || fn,
-        email: f.email || profile.email || "",
-        phone: f.phone || profile.phone || "",
-      }));
-    }
-  }
+    setForm((f) => ({
+      ...f,
+      full_name: f.full_name || fn,
+      email: f.email || profile.email || "",
+      phone: f.phone || profile.phone || "",
+    }));
+  }, [profile]);
 
   const registerMut = useMutation({
     mutationFn: () =>
