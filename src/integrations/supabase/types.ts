@@ -35,6 +35,92 @@ export type Database = {
         }
         Relationships: []
       }
+      event_volunteers: {
+        Row: {
+          created_at: string
+          department: Database["public"]["Enums"]["volunteer_department"]
+          email: string
+          event_id: string
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          department: Database["public"]["Enums"]["volunteer_department"]
+          email: string
+          event_id: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          department?: Database["public"]["Enums"]["volunteer_department"]
+          email?: string
+          event_id?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_volunteers_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          cover_photo_url: string | null
+          created_at: string
+          created_by: string
+          description: string
+          event_date: string
+          id: string
+          location: string | null
+          photo_urls: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_photo_url?: string | null
+          created_at?: string
+          created_by: string
+          description?: string
+          event_date: string
+          id?: string
+          location?: string | null
+          photo_urls?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_photo_url?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string
+          event_date?: string
+          id?: string
+          location?: string | null
+          photo_urls?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       membership_requests: {
         Row: {
           created_at: string
@@ -198,6 +284,13 @@ export type Database = {
         | "volunteer"
         | "member"
       member_status: "pending" | "active" | "inactive"
+      volunteer_department:
+        | "food"
+        | "parking"
+        | "helper"
+        | "children_management"
+        | "water_keeper"
+        | "pastor_assistant"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -335,6 +428,14 @@ export const Constants = {
         "member",
       ],
       member_status: ["pending", "active", "inactive"],
+      volunteer_department: [
+        "food",
+        "parking",
+        "helper",
+        "children_management",
+        "water_keeper",
+        "pastor_assistant",
+      ],
     },
   },
 } as const
