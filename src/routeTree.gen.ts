@@ -21,7 +21,9 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedMembersRouteImport } from './routes/_authenticated/members'
 import { Route as AuthenticatedIdCardRouteImport } from './routes/_authenticated/id-card'
+import { Route as AuthenticatedGalleryRouteImport } from './routes/_authenticated/gallery'
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
+import { Route as AuthenticatedEbooksRouteImport } from './routes/_authenticated/ebooks'
 import { Route as AuthenticatedDonationsRouteImport } from './routes/_authenticated/donations'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEventsIdRouteImport } from './routes/_authenticated/events.$id'
@@ -85,9 +87,19 @@ const AuthenticatedIdCardRoute = AuthenticatedIdCardRouteImport.update({
   path: '/id-card',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGalleryRoute = AuthenticatedGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
   id: '/events',
   path: '/events',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEbooksRoute = AuthenticatedEbooksRouteImport.update({
+  id: '/ebooks',
+  path: '/ebooks',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDonationsRoute = AuthenticatedDonationsRouteImport.update({
@@ -111,7 +123,9 @@ export interface FileRoutesByFullPath {
   '/join': typeof JoinRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/donations': typeof AuthenticatedDonationsRoute
+  '/ebooks': typeof AuthenticatedEbooksRoute
   '/events': typeof AuthenticatedEventsRouteWithChildren
+  '/gallery': typeof AuthenticatedGalleryRoute
   '/id-card': typeof AuthenticatedIdCardRoute
   '/members': typeof AuthenticatedMembersRoute
   '/messages': typeof AuthenticatedMessagesRoute
@@ -128,7 +142,9 @@ export interface FileRoutesByTo {
   '/join': typeof JoinRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/donations': typeof AuthenticatedDonationsRoute
+  '/ebooks': typeof AuthenticatedEbooksRoute
   '/events': typeof AuthenticatedEventsRouteWithChildren
+  '/gallery': typeof AuthenticatedGalleryRoute
   '/id-card': typeof AuthenticatedIdCardRoute
   '/members': typeof AuthenticatedMembersRoute
   '/messages': typeof AuthenticatedMessagesRoute
@@ -147,7 +163,9 @@ export interface FileRoutesById {
   '/join': typeof JoinRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/donations': typeof AuthenticatedDonationsRoute
+  '/_authenticated/ebooks': typeof AuthenticatedEbooksRoute
   '/_authenticated/events': typeof AuthenticatedEventsRouteWithChildren
+  '/_authenticated/gallery': typeof AuthenticatedGalleryRoute
   '/_authenticated/id-card': typeof AuthenticatedIdCardRoute
   '/_authenticated/members': typeof AuthenticatedMembersRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
@@ -166,7 +184,9 @@ export interface FileRouteTypes {
     | '/join'
     | '/dashboard'
     | '/donations'
+    | '/ebooks'
     | '/events'
+    | '/gallery'
     | '/id-card'
     | '/members'
     | '/messages'
@@ -183,7 +203,9 @@ export interface FileRouteTypes {
     | '/join'
     | '/dashboard'
     | '/donations'
+    | '/ebooks'
     | '/events'
+    | '/gallery'
     | '/id-card'
     | '/members'
     | '/messages'
@@ -201,7 +223,9 @@ export interface FileRouteTypes {
     | '/join'
     | '/_authenticated/dashboard'
     | '/_authenticated/donations'
+    | '/_authenticated/ebooks'
     | '/_authenticated/events'
+    | '/_authenticated/gallery'
     | '/_authenticated/id-card'
     | '/_authenticated/members'
     | '/_authenticated/messages'
@@ -310,11 +334,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIdCardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/gallery': {
+      id: '/_authenticated/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof AuthenticatedGalleryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/events': {
       id: '/_authenticated/events'
       path: '/events'
       fullPath: '/events'
       preLoaderRoute: typeof AuthenticatedEventsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ebooks': {
+      id: '/_authenticated/ebooks'
+      path: '/ebooks'
+      fullPath: '/ebooks'
+      preLoaderRoute: typeof AuthenticatedEbooksRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/donations': {
@@ -355,7 +393,9 @@ const AuthenticatedEventsRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDonationsRoute: typeof AuthenticatedDonationsRoute
+  AuthenticatedEbooksRoute: typeof AuthenticatedEbooksRoute
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRouteWithChildren
+  AuthenticatedGalleryRoute: typeof AuthenticatedGalleryRoute
   AuthenticatedIdCardRoute: typeof AuthenticatedIdCardRoute
   AuthenticatedMembersRoute: typeof AuthenticatedMembersRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
@@ -366,7 +406,9 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDonationsRoute: AuthenticatedDonationsRoute,
+  AuthenticatedEbooksRoute: AuthenticatedEbooksRoute,
   AuthenticatedEventsRoute: AuthenticatedEventsRouteWithChildren,
+  AuthenticatedGalleryRoute: AuthenticatedGalleryRoute,
   AuthenticatedIdCardRoute: AuthenticatedIdCardRoute,
   AuthenticatedMembersRoute: AuthenticatedMembersRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
