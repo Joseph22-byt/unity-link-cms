@@ -35,6 +35,42 @@ export type Database = {
         }
         Relationships: []
       }
+      ebooks: {
+        Row: {
+          author: string | null
+          cover_path: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          file_path: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          cover_path?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          file_path: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          cover_path?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          file_path?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       event_volunteers: {
         Row: {
           created_at: string
@@ -120,6 +156,71 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      gallery_items: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          file_path: string
+          id: string
+          media_type: Database["public"]["Enums"]["gallery_media_type"]
+          thumbnail_path: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          file_path: string
+          id?: string
+          media_type: Database["public"]["Enums"]["gallery_media_type"]
+          thumbnail_path?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          file_path?: string
+          id?: string
+          media_type?: Database["public"]["Enums"]["gallery_media_type"]
+          thumbnail_path?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      gallery_likes: {
+        Row: {
+          created_at: string
+          gallery_item_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          gallery_item_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          gallery_item_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_likes_gallery_item_id_fkey"
+            columns: ["gallery_item_id"]
+            isOneToOne: false
+            referencedRelation: "gallery_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       membership_requests: {
         Row: {
@@ -283,6 +384,7 @@ export type Database = {
         | "ministry_leader"
         | "volunteer"
         | "member"
+      gallery_media_type: "photo" | "video"
       member_status: "pending" | "active" | "inactive"
       volunteer_department:
         | "food"
@@ -427,6 +529,7 @@ export const Constants = {
         "volunteer",
         "member",
       ],
+      gallery_media_type: ["photo", "video"],
       member_status: ["pending", "active", "inactive"],
       volunteer_department: [
         "food",
