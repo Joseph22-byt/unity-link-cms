@@ -102,7 +102,10 @@ function EventDetailPage() {
       eventQ.refetch();
       volunteersQ.refetch();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      console.error("Volunteer registration failed", e);
+      toast.error(e.message || "Registration failed");
+    },
   });
 
   const deleteMut = useMutation({
