@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, UserCircle, LogOut, Church, IdCard, Megaphone, Heart, ClipboardList, CalendarDays } from "lucide-react";
+import { LayoutDashboard, Users, UserCircle, LogOut, Church, IdCard, Megaphone, Heart, ClipboardList, CalendarDays, BookOpen, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -14,6 +14,8 @@ const baseNav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/messages", label: "Announcements", icon: Megaphone },
   { to: "/events", label: "Events", icon: CalendarDays },
+  { to: "/gallery", label: "Gallery", icon: ImageIcon },
+  { to: "/ebooks", label: "Ebooks", icon: BookOpen },
   { to: "/donations", label: "Donations", icon: Heart },
   { to: "/id-card", label: "My ID Card", icon: IdCard },
   { to: "/members", label: "Members", icon: Users },
