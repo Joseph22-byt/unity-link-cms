@@ -16,6 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
   getEvent,
@@ -25,7 +33,7 @@ import {
   DEPARTMENT_OPTIONS,
 } from "@/lib/events.functions";
 import { getMyProfile } from "@/lib/members.functions";
-import { ArrowLeft, CalendarDays, MapPin, Trash2, Users } from "lucide-react";
+import { ArrowLeft, CalendarDays, MapPin, Trash2, Users, HandHeart } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/events/$id")({
   component: EventDetailPage,
@@ -99,6 +107,7 @@ function EventDetailPage() {
     onSuccess: () => {
       toast.success("Registered as volunteer. The team will reach out!");
       setForm({ ...form, notes: "", department: "" });
+      setRegisterOpen(false);
       eventQ.refetch();
       volunteersQ.refetch();
     },
@@ -126,6 +135,7 @@ function EventDetailPage() {
 
   const { event, cover_signed_url, photo_signed_urls, my_registrations } = eventQ.data;
   const date = new Date(event.event_date);
+  const [registerOpen, setRegisterOpen] = useState(false);
 
   return (
     <AppShell title={event.title}>
@@ -157,6 +167,22 @@ function EventDetailPage() {
           {event.description && (
             <p className="whitespace-pre-wrap text-base leading-relaxed">{event.description}</p>
           )}
+          {!isStaff && (
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <Button size="lg" onClick={() => setRegisterOpen(true)}>
+                <HandHeart className="w-4 h-4 mr-2" />
+                Register as Volunteer
+              </Button>
+              {my_registrations.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Signed up as:</span>
+                  {my_registrations.map((r) => (
+                    <Badge key={r.id} variant="secondary">{DEPARTMENT_LABELS[r.department] ?? r.department}</Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </Card>
 
         {photo_signed_urls.length > 0 && (
@@ -170,66 +196,68 @@ function EventDetailPage() {
         )}
 
         {!isStaff && (
-          <Card className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Users className="w-5 h-5 text-gold" />
-              <h2 className="font-display text-xl">Volunteer for this event</h2>
-            </div>
-            {my_registrations.length > 0 && (
-              <div className="mb-4 flex flex-wrap gap-2">
-                <span className="text-sm text-muted-foreground">You're signed up as:</span>
-                {my_registrations.map((r) => (
-                  <Badge key={r.id} variant="secondary">{DEPARTMENT_LABELS[r.department] ?? r.department}</Badge>
-                ))}
-              </div>
-            )}
-            <form
-              className="space-y-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!form.department) {
-                  toast.error("Please choose a department");
-                  return;
-                }
-                registerMut.mutate();
-              }}
-            >
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Full name</Label>
-                  <Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} required maxLength={120} />
+          <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-gold" /> Volunteer for {event.title}
+                </DialogTitle>
+                <DialogDescription>
+                  Choose the department you'd like to serve in. The team will contact you.
+                </DialogDescription>
+              </DialogHeader>
+              <form
+                className="space-y-4 pt-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!form.department) {
+                    toast.error("Please choose a department");
+                    return;
+                  }
+                  registerMut.mutate();
+                }}
+              >
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Full name</Label>
+                    <Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} required maxLength={120} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Phone</Label>
+                    <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required maxLength={30} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required maxLength={255} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Department</Label>
+                    <Select
+                      value={form.department || undefined}
+                      onValueChange={(v) => setForm({ ...form, department: v as (typeof DEPARTMENT_OPTIONS)[number] })}
+                    >
+                      <SelectTrigger><SelectValue placeholder="Choose a department" /></SelectTrigger>
+                      <SelectContent>
+                        {DEPARTMENT_OPTIONS.map((d) => (
+                          <SelectItem key={d} value={d}>{DEPARTMENT_LABELS[d]}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Phone</Label>
-                  <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required maxLength={30} />
+                  <Label>Notes (optional)</Label>
+                  <Textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} maxLength={1000} />
                 </div>
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required maxLength={255} />
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="ghost" onClick={() => setRegisterOpen(false)}>Cancel</Button>
+                  <Button type="submit" disabled={registerMut.isPending}>
+                    {registerMut.isPending ? "Submitting…" : "Register as volunteer"}
+                  </Button>
                 </div>
-                <div className="space-y-2">
-                  <Label>Department</Label>
-                  <Select value={form.department} onValueChange={(v) => setForm({ ...form, department: v as (typeof DEPARTMENT_OPTIONS)[number] })}>
-                    <SelectTrigger><SelectValue placeholder="Choose a department" /></SelectTrigger>
-                    <SelectContent>
-                      {DEPARTMENT_OPTIONS.map((d) => (
-                        <SelectItem key={d} value={d}>{DEPARTMENT_LABELS[d]}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Notes (optional)</Label>
-                <Textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} maxLength={1000} />
-              </div>
-              <div className="flex justify-end">
-                <Button type="submit" disabled={registerMut.isPending}>
-                  {registerMut.isPending ? "Submitting…" : "Register as volunteer"}
-                </Button>
-              </div>
-            </form>
-          </Card>
+              </form>
+            </DialogContent>
+          </Dialog>
         )}
 
         {isStaff && (
