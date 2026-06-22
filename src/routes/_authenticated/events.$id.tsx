@@ -78,6 +78,7 @@ function EventDetailPage() {
     department: "" as "" | (typeof DEPARTMENT_OPTIONS)[number],
     notes: "",
   });
+  const [registerOpen, setRegisterOpen] = useState(false);
 
   // Prefill from profile
   const profile = meQ.data?.profile;
@@ -135,7 +136,6 @@ function EventDetailPage() {
 
   const { event, cover_signed_url, photo_signed_urls, my_registrations } = eventQ.data;
   const date = new Date(event.event_date);
-  const [registerOpen, setRegisterOpen] = useState(false);
 
   return (
     <AppShell title={event.title}>
