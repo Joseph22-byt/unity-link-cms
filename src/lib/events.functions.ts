@@ -160,6 +160,9 @@ export const registerVolunteer = createServerFn({ method: "POST" })
       department: data.department,
       notes: data.notes?.trim() || null,
     });
+    if (error?.code === "23505") {
+      throw new Error("You are already registered for this event department.");
+    }
     if (error) throw new Error(error.message);
     return { ok: true };
   });
