@@ -1,0 +1,1 @@
+ALTER TYPE public.volunteer_department ADD VALUE IF NOT EXISTS 'chair_arrangement';
