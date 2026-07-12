@@ -8,6 +8,7 @@ const DEPARTMENTS = [
   "children_management",
   "water_keeper",
   "pastor_assistant",
+  "chair_arrangement",
 ] as const;
 type Department = (typeof DEPARTMENTS)[number];
 
