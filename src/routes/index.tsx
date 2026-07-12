@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
       { title: "Jessa Thetraravalar Ministries — Modern Church Management" },
       { name: "description", content: "Care for every member with reverent, modern tools — attendance, giving, ministries, and digital ID cards." },
       { property: "og:title", content: "Jessa Thetraravalar Ministries — Modern Church Management" },
-      { property: "og:description", content: "Care for every member with reverent, modern tools." },
+      { property: "og:description", content: "Care for every member with reverent, modern tools — attendance, giving, ministries, and digital ID cards." },
     ],
   }),
   component: Index,

@@ -79,13 +79,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Jessa Thetraravalar Ministries — Church Management" },
-      { name: "description", content: "A modern, reverent platform for member care, attendance, giving, and ministry." },
-      { property: "og:title", content: "Jessa Thetraravalar Ministries — Church Management" },
-      { property: "og:description", content: "Member care, attendance, giving, and ministry — beautifully managed." },
+      { title: "Jessa Thetraravalar Ministries — Modern Church Management" },
+      { name: "description", content: "Care for every member with reverent, modern tools — attendance, giving, ministries, and digital ID cards." },
+      { property: "og:title", content: "Jessa Thetraravalar Ministries — Modern Church Management" },
+      { property: "og:description", content: "Care for every member with reverent, modern tools — attendance, giving, ministries, and digital ID cards." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Jessa Thetraravalar Ministries — Modern Church Management" },
+      { name: "twitter:description", content: "Care for every member with reverent, modern tools — attendance, giving, ministries, and digital ID cards." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a0e4d28b-bbda-4369-96c7-a40ccc431d25/id-preview-a4b18745--1acd170a-dab8-4b05-a895-4a0aed0706bf.lovable.app-1783865952213.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a0e4d28b-bbda-4369-96c7-a40ccc431d25/id-preview-a4b18745--1acd170a-dab8-4b05-a895-4a0aed0706bf.lovable.app-1783865952213.png" },
     ],
     links: [
       {
