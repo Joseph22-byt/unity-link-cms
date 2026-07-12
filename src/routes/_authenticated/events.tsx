@@ -107,7 +107,14 @@ function EventsPage() {
       setVolunteerForm((current) => ({ ...current, department: "", notes: "" }));
       setSelectedEvent(null);
     },
-    onError: (error: Error) => toast.error(error.message || "Registration failed. Please try again."),
+    onError: (error: Error) => {
+      const message = error.message || "Registration failed. Please try again.";
+      toast.error(
+        message.includes("event_volunteers_event_id_user_id_department_key") || message.includes("duplicate key")
+          ? "You are already registered for this event department."
+          : message,
+      );
+    },
   });
 
   async function uploadOne(file: File, prefix: string): Promise<string> {
