@@ -100,6 +100,12 @@ function EventsPage() {
           department: volunteerForm.department as (typeof DEPARTMENT_OPTIONS)[number],
           notes: volunteerForm.notes,
         },
+      }).catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        if (message.includes("event_volunteers_event_id_user_id_department_key") || message.includes("duplicate key")) {
+          throw new Error("You are already registered for this event department.");
+        }
+        throw error;
       });
     },
     onSuccess: () => {
