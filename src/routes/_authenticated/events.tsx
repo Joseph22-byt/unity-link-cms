@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,23 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { listEvents, createEvent } from "@/lib/events.functions";
+import { listEvents, createEvent, registerVolunteer, DEPARTMENT_OPTIONS } from "@/lib/events.functions";
 import { getMyProfile } from "@/lib/members.functions";
 import { CalendarDays, MapPin, Plus, ImagePlus, HandHeart } from "lucide-react";
 
@@ -24,10 +38,21 @@ export const Route = createFileRoute("/_authenticated/events")({
 
 const STAFF_ROLES = ["super_admin", "admin", "pastor"];
 
+const DEPARTMENT_LABELS: Record<string, string> = {
+  food: "Food",
+  parking: "Parking",
+  helper: "Helper",
+  children_management: "Children Management",
+  water_keeper: "Water Keeper",
+  pastor_assistant: "Pastor Assistant",
+  chair_arrangement: "Chair Arrangement",
+};
+
 function EventsPage() {
   const fetchEvents = useServerFn(listEvents);
   const fetchMe = useServerFn(getMyProfile);
   const create = useServerFn(createEvent);
+  const register = useServerFn(registerVolunteer);
 
   const meQ = useQuery({ queryKey: ["me"], queryFn: () => fetchMe() });
   const eventsQ = useQuery({ queryKey: ["events"], queryFn: () => fetchEvents() });
@@ -39,6 +64,64 @@ function EventsPage() {
   const [form, setForm] = useState({ title: "", description: "", location: "", event_date: "" });
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<{ id: string; title: string } | null>(null);
+  const [volunteerForm, setVolunteerForm] = useState({
+    full_name: "",
+    phone: "",
+    email: "",
+    department: "" as "" | (typeof DEPARTMENT_OPTIONS)[number],
+    notes: "",
+  });
+
+  useEffect(() => {
+    const profile = meQ.data?.profile;
+    if (!profile) return;
+    const fullName = `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim();
+    setVolunteerForm((current) => ({
+      ...current,
+      full_name: current.full_name || fullName,
+      email: current.email || profile.email || "",
+      phone: current.phone || profile.phone || "",
+    }));
+  }, [meQ.data?.profile]);
+
+  const registerMut = useMutation({
+    mutationFn: () => {
+      if (!selectedEvent) throw new Error("Choose an event first");
+      if (!volunteerForm.full_name.trim()) throw new Error("Please enter your name");
+      if (!volunteerForm.phone.trim()) throw new Error("Please enter your phone number");
+      if (!volunteerForm.email.trim()) throw new Error("Please enter your email");
+      return register({
+        data: {
+          event_id: selectedEvent.id,
+          full_name: volunteerForm.full_name,
+          phone: volunteerForm.phone,
+          email: volunteerForm.email,
+          department: volunteerForm.department as (typeof DEPARTMENT_OPTIONS)[number],
+          notes: volunteerForm.notes,
+        },
+      }).catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        if (message.includes("event_volunteers_event_id_user_id_department_key") || message.includes("duplicate key")) {
+          throw new Error("You are already registered for this event department.");
+        }
+        throw error;
+      });
+    },
+    onSuccess: () => {
+      toast.success("Volunteer registration submitted. Admins can now see it.");
+      setVolunteerForm((current) => ({ ...current, department: "", notes: "" }));
+      setSelectedEvent(null);
+    },
+    onError: (error: Error) => {
+      const message = error.message || "Registration failed. Please try again.";
+      toast.error(
+        message.includes("event_volunteers_event_id_user_id_department_key") || message.includes("duplicate key")
+          ? "You are already registered for this event department."
+          : message,
+      );
+    },
+  });
 
   async function uploadOne(file: File, prefix: string): Promise<string> {
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
@@ -81,6 +164,20 @@ function EventsPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function openVolunteerForm(event: { id: string; title: string }) {
+    setSelectedEvent(event);
+  }
+
+  function submitVolunteer(e: React.FormEvent) {
+    e.preventDefault();
+    if (registerMut.isPending) return;
+    if (!volunteerForm.department) {
+      toast.error("Please choose a department");
+      return;
+    }
+    registerMut.mutate();
   }
 
   return (
@@ -145,8 +242,8 @@ function EventsPage() {
           const date = new Date(ev.event_date);
           const upcoming = date.getTime() > Date.now();
           return (
-            <Link key={ev.id} to="/events/$id" params={{ id: ev.id }} className="block">
-              <Card className="overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col">
+            <Card key={ev.id} className="overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col">
+              <Link to="/events/$id" params={{ id: ev.id }} className="block">
                 <div className="aspect-video bg-muted relative">
                   {ev.cover_signed_url ? (
                     <img src={ev.cover_signed_url} alt={ev.title} className="w-full h-full object-cover" />
@@ -159,8 +256,11 @@ function EventsPage() {
                     {upcoming ? "Upcoming" : "Past"}
                   </Badge>
                 </div>
+              </Link>
                 <div className="p-4 flex-1 flex flex-col">
-                  <h3 className="font-display text-lg leading-snug mb-1 line-clamp-2">{ev.title}</h3>
+                  <Link to="/events/$id" params={{ id: ev.id }} className="hover:underline">
+                    <h3 className="font-display text-lg leading-snug mb-1 line-clamp-2">{ev.title}</h3>
+                  </Link>
                   <div className="text-xs text-muted-foreground flex items-center gap-1 mb-1">
                     <CalendarDays className="w-3.5 h-3.5" />
                     {date.toLocaleString()}
@@ -175,17 +275,78 @@ function EventsPage() {
                   )}
                   {!isStaff && (
                     <div className="mt-4 pt-3 border-t border-border">
-                      <Button size="sm" className="w-full" tabIndex={-1}>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="w-full"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          openVolunteerForm({ id: ev.id, title: ev.title });
+                        }}
+                      >
                         <HandHeart className="w-4 h-4 mr-1" /> Click to register as volunteer
                       </Button>
                     </div>
                   )}
                 </div>
-              </Card>
-            </Link>
+            </Card>
           );
         })}
       </div>
+
+      {!isStaff && (
+        <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Volunteer Registration</DialogTitle>
+              <DialogDescription>
+                {selectedEvent ? `Register for ${selectedEvent.title}` : "Choose the department where you want to serve."}
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={submitVolunteer} className="space-y-4 pt-2">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Full name</Label>
+                  <Input value={volunteerForm.full_name} onChange={(e) => setVolunteerForm({ ...volunteerForm, full_name: e.target.value })} required maxLength={120} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Phone</Label>
+                  <Input value={volunteerForm.phone} onChange={(e) => setVolunteerForm({ ...volunteerForm, phone: e.target.value })} required maxLength={30} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" value={volunteerForm.email} onChange={(e) => setVolunteerForm({ ...volunteerForm, email: e.target.value })} required maxLength={255} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Department</Label>
+                  <Select
+                    value={volunteerForm.department}
+                    onValueChange={(value) => setVolunteerForm({ ...volunteerForm, department: value as (typeof DEPARTMENT_OPTIONS)[number] })}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Choose a department" /></SelectTrigger>
+                    <SelectContent>
+                      {DEPARTMENT_OPTIONS.map((department) => (
+                        <SelectItem key={department} value={department}>{DEPARTMENT_LABELS[department]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Notes (optional)</Label>
+                <Textarea rows={3} value={volunteerForm.notes} onChange={(e) => setVolunteerForm({ ...volunteerForm, notes: e.target.value })} maxLength={1000} />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="ghost" onClick={() => setSelectedEvent(null)}>Cancel</Button>
+                <Button type="submit" disabled={registerMut.isPending}>
+                  {registerMut.isPending ? "Submitting…" : "Submit registration"}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
     </AppShell>
   );
 }

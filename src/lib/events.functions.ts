@@ -151,15 +151,23 @@ export const registerVolunteer = createServerFn({ method: "POST" })
   })
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase.from("event_volunteers").insert({
-      event_id: data.event_id,
-      user_id: userId,
-      full_name: data.full_name.trim(),
-      phone: data.phone.trim(),
-      email: data.email.trim(),
-      department: data.department,
-      notes: data.notes?.trim() || null,
-    });
+    const { error } = await supabase
+      .from("event_volunteers")
+      .upsert(
+        {
+          event_id: data.event_id,
+          user_id: userId,
+          full_name: data.full_name.trim(),
+          phone: data.phone.trim(),
+          email: data.email.trim(),
+          department: data.department,
+          notes: data.notes?.trim() || null,
+        },
+        { onConflict: "event_id,user_id,department", ignoreDuplicates: true },
+      );
+    if (error?.code === "23505") {
+      throw new Error("You are already registered for this event department.");
+    }
     if (error) throw new Error(error.message);
     return { ok: true };
   });
