@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { listEvents, createEvent } from "@/lib/events.functions";
 import { getMyProfile } from "@/lib/members.functions";
-import { CalendarDays, MapPin, Plus, ImagePlus } from "lucide-react";
+import { CalendarDays, MapPin, Plus, ImagePlus, HandHeart } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/events")({
   head: () => ({ meta: [{ title: "Events — Jessa Thetraravalar Ministries" }] }),
@@ -172,6 +172,13 @@ function EventsPage() {
                   )}
                   {ev.description && (
                     <p className="text-sm text-muted-foreground mt-2 line-clamp-3">{ev.description}</p>
+                  )}
+                  {!isStaff && (
+                    <div className="mt-4 pt-3 border-t border-border">
+                      <Button size="sm" className="w-full" tabIndex={-1}>
+                        <HandHeart className="w-4 h-4 mr-1" /> Click to register as volunteer
+                      </Button>
+                    </div>
                   )}
                 </div>
               </Card>
