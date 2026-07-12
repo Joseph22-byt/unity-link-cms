@@ -88,6 +88,9 @@ function EventsPage() {
   const registerMut = useMutation({
     mutationFn: () => {
       if (!selectedEvent) throw new Error("Choose an event first");
+      if (!volunteerForm.full_name.trim()) throw new Error("Please enter your name");
+      if (!volunteerForm.phone.trim()) throw new Error("Please enter your phone number");
+      if (!volunteerForm.email.trim()) throw new Error("Please enter your email");
       return register({
         data: {
           event_id: selectedEvent.id,
@@ -104,7 +107,7 @@ function EventsPage() {
       setVolunteerForm((current) => ({ ...current, department: "", notes: "" }));
       setSelectedEvent(null);
     },
-    onError: (error: Error) => toast.error(error.message || "Registration failed"),
+    onError: (error: Error) => toast.error(error.message || "Registration failed. Please try again."),
   });
 
   async function uploadOne(file: File, prefix: string): Promise<string> {
@@ -156,6 +159,7 @@ function EventsPage() {
 
   function submitVolunteer(e: React.FormEvent) {
     e.preventDefault();
+    if (registerMut.isPending) return;
     if (!volunteerForm.department) {
       toast.error("Please choose a department");
       return;
@@ -258,7 +262,16 @@ function EventsPage() {
                   )}
                   {!isStaff && (
                     <div className="mt-4 pt-3 border-t border-border">
-                      <Button size="sm" className="w-full" onClick={() => openVolunteerForm({ id: ev.id, title: ev.title })}>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="w-full"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          openVolunteerForm({ id: ev.id, title: ev.title });
+                        }}
+                      >
                         <HandHeart className="w-4 h-4 mr-1" /> Click to register as volunteer
                       </Button>
                     </div>
@@ -295,7 +308,7 @@ function EventsPage() {
                 <div className="space-y-2">
                   <Label>Department</Label>
                   <Select
-                    value={volunteerForm.department || undefined}
+                    value={volunteerForm.department}
                     onValueChange={(value) => setVolunteerForm({ ...volunteerForm, department: value as (typeof DEPARTMENT_OPTIONS)[number] })}
                   >
                     <SelectTrigger><SelectValue placeholder="Choose a department" /></SelectTrigger>
