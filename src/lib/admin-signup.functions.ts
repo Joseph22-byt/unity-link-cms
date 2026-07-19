@@ -1,9 +1,30 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const signUpAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: { email: string; password: string; first_name: string; last_name: string }) => d)
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Only an existing admin/super_admin may create additional admin accounts.
+    // Bootstrap exception: if no admins exist yet, allow the first admin creation
+    // by any authenticated user (needed for initial setup).
+    const { count: adminCount, error: countErr0 } = await supabaseAdmin
+      .from("user_roles")
+      .select("*", { count: "exact", head: true })
+      .eq("role", "admin");
+    if (countErr0) throw new Error(countErr0.message);
+
+    if ((adminCount ?? 0) > 0) {
+      const { data: isAdmin, error: roleCheckErr } = await context.supabase.rpc("is_admin", {
+        _user_id: context.userId,
+      });
+      if (roleCheckErr) throw new Error(roleCheckErr.message);
+      if (!isAdmin) {
+        throw new Error("Only existing administrators can create new admin accounts.");
+      }
+    }
 
     // Enforce a hard limit of 2 admin accounts
     const { count, error: countErr } = await supabaseAdmin
